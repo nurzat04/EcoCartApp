@@ -6,14 +6,15 @@ import icons from "@/constants/icons";
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { useEffect } from "react";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
     const router = useRouter();
     const { username, avatar, setUsername, setAvatar } = useUserStore();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const loadData = async () => {
@@ -21,10 +22,13 @@ export default function Index() {
             const storedAvatar = await SecureStore.getItemAsync("avatar");
             if (storedName) setUsername(storedName);
             if (storedAvatar) setAvatar(storedAvatar);
+            setLoading(false)
         };
         loadData();
     }, []);
-
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />;
+    }
     return (
         <SafeAreaView className="bg-white h-full">
             <ScrollView className="px-3">

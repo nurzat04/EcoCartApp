@@ -9,7 +9,6 @@ import {
     View,
 } from "react-native";
 
-import { settings } from "@/constants/data";
 import icons from "@/constants/icons";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useUserStore } from '@/stores/userStore';
@@ -53,7 +52,7 @@ const SettingsItem = ({
 const Profile = () => {
     const { refetch, setIsLoggedIn } = useGlobalContext();
     const router = useRouter();
-    const { username, setUsername, token, setToken, avatar, setAvatar } = useUserStore()
+    const { username, setUsername, token, setToken, avatar, setAvatar, isAdmin, setIsAdmin, isVendor, setIsVendor } = useUserStore()
 
     useEffect(() => {
         SecureStore.getItemAsync("username").then((value) => {
@@ -71,12 +70,26 @@ const Profile = () => {
                 setAvatar(value);
             }
         });
+
+        SecureStore.getItemAsync("isAdmin").then((value) => {
+            if (value !== null) {
+                setIsAdmin((value === "true").toString());
+            }
+        });
+
+        SecureStore.getItemAsync("isVendor").then((value) => {
+            if (value !== null) {
+                setIsVendor((value === "true").toString());
+            }
+        });
     }, []);
 
     const handleLogout = async () => {
         await SecureStore.deleteItemAsync('jwt');
         await SecureStore.deleteItemAsync("username");
         await SecureStore.deleteItemAsync("avatar");
+        await SecureStore.deleteItemAsync("isAdmin");
+        await SecureStore.deleteItemAsync("isVendor");
         await refetch();
         setIsLoggedIn(false);
         Alert.alert("Success", "Logged out successfully");
@@ -156,9 +169,10 @@ const Profile = () => {
                 <View className="flex flex-row justify-center mt-5">
                     <View className="flex flex-col items-center relative mt-5">
                         <Image
-                            source={avatar ? { uri: avatar } : require('@/assets/images/japan.png')}
+                            source={avatar && avatar.trim() !== "" ? { uri: avatar } : require('@/assets/images/japan.png')}
                             className="size-44 relative rounded-full"
                         />
+
                         <TouchableOpacity
                             className="absolute bottom-11 right-2"
                             onPress={pickImageAndUpload}
@@ -171,15 +185,21 @@ const Profile = () => {
                 </View>
 
                 <View className="flex flex-col mt-8">
-                    <SettingsItem icon={icons.calendar} title="My Bookings" />
+                    {/* <SettingsItem icon={icons.calendar} title="My Bookings" /> */}
                     <SettingsItem icon={icons.person} title="Contacts" onPress={() => router.push('/(root)/contactspage')} />
+                    {isAdmin === "true" && (
+                        <SettingsItem icon={icons.person} title="Dashboard" onPress={() => router.push('/admin')} />
+                    )}
+                    {isVendor === "true" && (
+                        <SettingsItem icon={icons.person} title="Vendor Dashboard" onPress={() => router.push('/vendor')} />
+                    )}
                 </View>
 
-                <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
+                {/* <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
                     {settings.slice(2).map((item, index) => (
                         <SettingsItem key={index} {...item} />
                     ))}
-                </View>
+                </View> */}
 
                 <View className="flex flex-col border-t mt-5 pt-5 border-primary-200">
                     <SettingsItem

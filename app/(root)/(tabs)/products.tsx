@@ -147,6 +147,7 @@ const Products = () => {
         let countdown = null;
         let countdownColor = '#000'; // 默认黑色
         let discount = null;
+        const lowestSupplier = item.suppliers_info.find(s => s.is_lowest_price);
 
         // 循环检查所有供应商的折扣
         for (let i = 0; i < item.suppliers_info.length; i++) {
@@ -186,41 +187,54 @@ const Products = () => {
                         style={styles.productImage}
                         resizeMode="cover"
                     />
-                    <View style={styles.productInfo}>
-                        <Text style={styles.productName}>{item.name}</Text>
-
-                        <View style={styles.productPriceContainer}>
-                            <Text style={styles.finalPrice}>${item.suppliers_info[0].final_price}</Text>
-                            {item.suppliers_info[0].discount && (
-                                <Text style={styles.originalPrice}>${item.suppliers_info[0].price}</Text>
-                            )}
-                        </View>
-
-                        {discount && (
-                            <Text style={styles.productDiscount}>
-                                {discount.type === 'percentage'
-                                    ? `${discount.value}% OFF`
-                                    : `-$${discount.value}`}
+                    <View style={styles.productPriceContainer}>
+                        {lowestSupplier ? (
+                            <>
+                                <Text style={styles.finalPrice}>
+                                    ${lowestSupplier.final_price}
+                                </Text>
+                                {/* <Text style={styles.supplierName}>
+                                    {lowestSupplier.supplier_name}（最低价）
+                                </Text> */}
+                                {lowestSupplier.discount && (
+                                    <Text style={styles.originalPrice}>
+                                        ${lowestSupplier.price}
+                                    </Text>
+                                )}
+                            </>
+                        ) : (
+                            <Text style={styles.finalPrice}>
+                                ${item.suppliers_info[0]?.final_price}
                             </Text>
                         )}
-
-                        {discount && countdown !== 'Expired' && (
-                            <View style={styles.discountTimerContainer}>
-                                <Ionicons name="time" size={10} color="#d62828" />
-                                <Text style={[styles.discountTimer, { color: countdownColor }]}>
-                                    {countdown}
-                                </Text>
-                            </View>
-                        )}
-
-                        {discount && countdown === 'Expired' && (
-                            <Text style={styles.discountExpired}>Discount expired</Text>
-                        )}
-
-                        <Text style={[styles.productStockStatus, item.suppliers_info[0]?.stock_status === 'in_stock' ? styles.inStock : styles.outOfStock]}>
-                            {item.suppliers_info[0]?.stock_status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
-                        </Text>
                     </View>
+
+
+
+                    {discount && (
+                        <Text style={styles.productDiscount}>
+                            {discount.type === 'percentage'
+                                ? `${discount.value}% OFF`
+                                : `-$${discount.value}`}
+                        </Text>
+                    )}
+
+                    {discount && countdown !== 'Expired' && (
+                        <View style={styles.discountTimerContainer}>
+                            <Ionicons name="time" size={10} color="#d62828" />
+                            <Text style={[styles.discountTimer, { color: countdownColor }]}>
+                                {countdown}
+                            </Text>
+                        </View>
+                    )}
+
+                    {discount && countdown === 'Expired' && (
+                        <Text style={styles.discountExpired}>Discount expired</Text>
+                    )}
+
+                    <Text style={[styles.productStockStatus, item.suppliers_info[0]?.stock_status === 'in_stock' ? styles.inStock : styles.outOfStock]}>
+                        {item.suppliers_info[0]?.stock_status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+                    </Text>
                 </View>
             </TouchableOpacity>
         );
@@ -459,14 +473,14 @@ const styles = StyleSheet.create({
     finalPrice: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#31572c',
+        color: '#4F772D',
+        marginLeft: 8,
     },
-
     originalPrice: {
-        fontSize: 12,
-        color: '#999',
+        fontSize: 14,
         textDecorationLine: 'line-through',
-        marginLeft: 5,
+        color: '#999',
+        marginLeft: 8,
     },
     productDiscount: {
         fontSize: 12,
@@ -474,9 +488,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#bc3908',
         width: 70,
         height: 17,
-        position: 'absolute',
-        bottom: 260,
-        right: 67,
+        position: 'relative',
+        bottom: 400,
+        right: 0,
         borderRadius: 4,
     },
 
@@ -498,9 +512,11 @@ const styles = StyleSheet.create({
     },
     productStockStatus: {
         fontSize: 11,
-        marginTop: 30,
+        marginTop: 10,
         color: '#245501',
         width: 70,
+        marginLeft: 8,
+        marginBottom: 10,
     },
     inStock: { color: '#245501' },
     outOfStock: { color: '#d62828' },
@@ -582,7 +598,7 @@ const styles = StyleSheet.create({
     applyButton: {
         color: '#4F772D',
         fontWeight: 'bold'
-    }
+    },
 
 });
 

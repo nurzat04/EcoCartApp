@@ -30,8 +30,8 @@ const TabIcon = ({
     </View>
 );
 
-
 const TabsLayout = () => {
+
     return (
         <Tabs screenOptions={{
             tabBarShowLabel: false,

@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import Checkbox from 'expo-checkbox';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -27,8 +26,6 @@ const ShoppingListItems = () => {
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState<number[]>([]);
     const [editMode, setEditMode] = useState(false);
-    const [datePickerVisible, setDatePickerVisible] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<any>(null);
     const [collapsedCompleted, setCollapsedCompleted] = useState(false); // 新增状态，控制已完成分组的展开/折叠
     const router = useRouter()
 
@@ -160,25 +157,6 @@ const ShoppingListItems = () => {
         });
     };
 
-    const editExpiration = (item: any) => {
-        setSelectedItem(item);
-        setDatePickerVisible(true);
-    };
-
-    const onDateChange = async (event: any, selectedDate?: Date) => {
-        setDatePickerVisible(false);
-        if (event.type === 'set' && selectedItem && selectedDate) {
-            const token = await SecureStore.getItemAsync('jwt');
-            const isoDate = selectedDate.toISOString().split('T')[0]; // 格式为 YYYY-MM-DD
-            await axios.patch(`${API_BASE}/items/${selectedItem.id}/`, {
-                expiration_date: isoDate,
-            }, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            fetchItems();
-            setSelectedItem(null);
-        }
-    };
 
     const renderItem = ({ item }: { item: any }) => {
         const product = item.product;
@@ -247,15 +225,18 @@ const ShoppingListItems = () => {
                                     </Text>
                                 </Text>
 
-                                <Text>{supplier?.price * item.quantity}</Text>
-                                <Text>{item.total_price}</Text>
+                                {Number((supplier?.price * item.quantity).toFixed(2)) !== Number(item.total_price) ? (
+                                    <View>
+                                        <Text style={styles.strike}>${(supplier?.price * item.quantity).toFixed(2)}</Text>
+                                        <Text style={styles.finalPrice}>${Number(item.total_price).toFixed(2)}</Text>
+                                    </View>
+                                ) : (
+                                    <Text style={styles.finalPrice}>${Number(item.total_price).toFixed(2)}</Text>
+                                )}
 
-                                <View style={{ flexDirection: 'row', gap: 12, position: 'relative', top: 4, left: 110 }}>
+                                <View style={{ flexDirection: 'row', gap: 12, position: 'relative', top: 4, left: 160 }}>
                                     <TouchableOpacity onPress={() => editQuantity(item)}>
                                         <Icon name="edit-2" size={16} color="#4B5563" />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => editExpiration(item)}>
-                                        <Icon name="calendar" size={16} color="#4B5563" />
                                     </TouchableOpacity>
                                 </View>
 
@@ -357,14 +338,6 @@ const ShoppingListItems = () => {
                         />
                     )}
                 </>
-            )}
-            {datePickerVisible && (
-                <DateTimePicker
-                    value={new Date(selectedItem?.expiration_date || new Date())}
-                    mode="date"
-                    display="default"
-                    onChange={onDateChange}
-                />
             )}
         </GestureHandlerRootView>
     );
@@ -472,7 +445,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#4F772D',
-        paddingHorizontal: 6,
+        paddingHorizontal: 0,
         paddingVertical: 2,
         borderRadius: 6,
     },

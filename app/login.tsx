@@ -19,11 +19,14 @@ const Login = () => {
     const [imageHeight] = useState(new Animated.Value(230));
     const [loadings, setLoadings] = useState(false);
     const { refetch, loading, isLoggedIn } = useGlobalContext()
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isVendor, setIsVendor] = useState(false);
     const router = useRouter();
     const { setIsLoggedIn } = useGlobalContext()
 
-    if (!loading && isLoggedIn) return <Redirect href="/" />
-
+    if (isLoggedIn && !loadings) {
+        return <Redirect href="/" />
+    }
     const validationSchema = Yup.object().shape({
         email: Yup.string().email('Invalid email').required('Email is required'),
         password: Yup.string().required('Password is required').min(6, 'Password must be at least 6 characters'),
@@ -62,6 +65,17 @@ const Login = () => {
             await SecureStore.setItemAsync('username', response.data.user.username);
             const imageUrl = `http://172.20.10.3:8000${response.data.user.image}`;
             await SecureStore.setItemAsync("avatar", imageUrl);
+
+            const isAdmin = response.data.user.is_admin;
+            setIsAdmin(isAdmin);
+            await SecureStore.setItemAsync('isAdmin', String(isAdmin));
+
+            const isVendor = response.data.user.is_vendor;
+            setIsVendor(isVendor);
+            await SecureStore.setItemAsync('isVendor', String(isVendor));
+
+
+
             Toast.show({
                 type: 'success',
                 text1: '🎉 Welcome to EcoCart!',

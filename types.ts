@@ -28,6 +28,7 @@ export type SupplierInfo = {
     stock_status: string;
     discount: Discount | null;
     final_price: string;
+    is_lowest_price: boolean;
 };
 
 export type Product = {
@@ -37,6 +38,7 @@ export type Product = {
     category: string;
     suppliers_info: SupplierInfo[];
     image: string;
+    stock_status: 'in_stock' | 'out_of_stock';
 };
 
 export type ShoppingItem = {

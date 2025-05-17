@@ -201,7 +201,14 @@ export default function ShoppingListScreen() {
                 style={styles.fab}
                 onPress={handleCreateList}
             >
-                <Icon name="plus" size={30} color="black" />
+                <Icon name="plus" size={30} color="white" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.fabs}
+                onPress={() => router.push('/fridge')}
+            >
+                <Image source={require('../../../assets/icons/fridge1.png')} style={{ width: 40, height: 40 }} />
             </TouchableOpacity>
 
             <Modal
@@ -360,14 +367,27 @@ const styles = StyleSheet.create({
     fab: {
         position: 'absolute',
         right: 20,
-        top: 70,
+        bottom: 90,
         width: 60,
         height: 60,
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 10,
+        backgroundColor: '#36820e',
     },
+    fabs: {
+        position: 'absolute',
+        right: 10,
+        top: 60,
+        width: 80,
+        height: 80,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 10,
+    },
+
     modalOverlay: {
         flex: 1,
         justifyContent: 'center',

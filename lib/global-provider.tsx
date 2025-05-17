@@ -53,6 +53,7 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
     // 更新 isLoggedIn 的状态
     if (user && !isLoggedIn) {
         setIsLoggedIn(true);
+
     }
 
     const refetch = async () => {
