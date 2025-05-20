@@ -44,7 +44,7 @@ Built with **React Native** and powered by **Expo**, this app brings a smooth an
 ```bash
 # Clone the repo
 git clone https://github.com/nurzat04/EcoCartApp.git
-cd echo-cart-frontend
+cd EcoCartApp
 
 # Install dependencies
 npm install
